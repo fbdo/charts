@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  shopware:
+  - apiVersion: v1
+    appVersion: 6.1.3
+    created: "2020-03-16T16:19:11.363633+01:00"
+    description: Shopware is a modular online shop system developed in Germany since
+      2004
+    digest: 81dfba8b7c3114b0b8ce82d63fa523f5fdef0340e1875be102442e5d384a96b8
+    home: https://www.shopware.com
+    icon: https://www.shopware.com/media/unknown/97/41/bb/sw-logo-blue.svg
+    keywords:
+    - shopware
+    - e-commerce
+    - http
+    - web
+    - application
+    - php
+    name: shopware
+    sources:
+    - https://github.com/shopware/platform
+    urls:
+    - https://fbdo.github.io/charts/shopware-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-03-16T16:19:11.363+01:00"
