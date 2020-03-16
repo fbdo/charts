@@ -11,7 +11,12 @@ jobs:
 
       - name: Build Helm package
         uses: lachlanevenson/k8s-helm
-        run: helm package shopware -d gh-files && cd gh-files && helm repo index --url https://fbdo.github.io/charts/ .
+        with:
+          args: package shopware -d gh-files
+      - name: Index Helm package
+        uses: lachlanevenson/k8s-helm
+        with:
+          args: repo index gh-files --url https://fbdo.github.io/charts/
 
       - name: Deploy Helm chart
         uses: JamesIves/github-pages-deploy-action@releases/v3
