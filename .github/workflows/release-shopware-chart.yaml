@@ -10,11 +10,11 @@ jobs:
           persist-credentials: false
 
       - name: Build Helm package
-        uses: lachlanevenson/k8s-helm
+        uses: docker://lachlanevenson/k8s-helm
         with:
           args: package shopware -d gh-files
       - name: Index Helm package
-        uses: lachlanevenson/k8s-helm
+        uses: docker://lachlanevenson/k8s-helm
         with:
           args: repo index gh-files --url https://fbdo.github.io/charts/
 
