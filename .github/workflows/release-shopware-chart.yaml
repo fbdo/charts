@@ -1,0 +1,21 @@
+name: Publish Shopware chart to gihub pages
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Build Helm package
+        uses: lachlanevenson/k8s-helm
+        run: helm package shopware -d gh-files && cd gh-files && helm repo index --url https://fbdo.github.io/charts/ .
+
+      - name: Deploy Helm chart
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: gh-files
