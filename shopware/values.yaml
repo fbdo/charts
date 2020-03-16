@@ -1,0 +1,14 @@
+image:
+  registry: docker.io
+  repository: shopware/production
+  tag: 6.1.3
+  pullPolicy: IfNotPresent
+
+labels:
+  env: "dev"
+  cluster: "dev"
+
+service:
+  port: 80
+  targetPort: 8000
+  type: LoadBalancer
