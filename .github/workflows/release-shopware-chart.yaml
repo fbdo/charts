@@ -1,7 +1,11 @@
 name: Publish Shopware chart to gihub pages
-on: [push]
+on:
+  push:
+    tags:
+      - "v*"
 jobs:
-  build-and-deploy:
+  build:
+    name: Create Release Shopware Chart
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -9,10 +13,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate Helm chart
+        uses: docker://lachlanevenson/k8s-helm
+        with:
+          args: lint shopware
+
       - name: Build Helm package
         uses: docker://lachlanevenson/k8s-helm
         with:
           args: package shopware -d gh-files
+
       - name: Index Helm package
         uses: docker://lachlanevenson/k8s-helm
         with:
@@ -24,3 +34,16 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: gh-files
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Released version ${{ github.ref }}
+          draft: false
+          prerelease: false
