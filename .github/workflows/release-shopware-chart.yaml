@@ -45,5 +45,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             Released version ${{ github.ref }}
+            See github hosted chart repository here: https://fbdo.github.io/charts
           draft: false
           prerelease: false
