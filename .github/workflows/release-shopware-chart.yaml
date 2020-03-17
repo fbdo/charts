@@ -16,7 +16,7 @@ jobs:
       - name: Index Helm package
         uses: docker://lachlanevenson/k8s-helm
         with:
-          args: repo index gh-files --url https://fbdo.github.io/charts/
+          args: repo index gh-files --url https://fbdo.github.io/charts/ --merge https://fbdo.github.io/charts/index.yaml
 
       - name: Deploy Helm chart
         uses: JamesIves/github-pages-deploy-action@releases/v3
