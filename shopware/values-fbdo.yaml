@@ -1,0 +1,11 @@
+image:
+  repository: fbdo/shopware
+  tag: latest
+
+resources:
+  limits:
+    cpu: 325m
+    memory: 650Mi
+  requests:
+    memory: 500Mi
+    cpu: 250m

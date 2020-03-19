@@ -47,10 +47,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 1200m
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
             requests:
-              cpu: 800m
-              memory: "100Mi"
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
           livenessProbe:
             httpGet:
               path: /

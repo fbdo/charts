@@ -12,3 +12,11 @@ service:
   port: 80
   targetPort: 8000
   type: LoadBalancer
+
+resources:
+  limits:
+    cpu: 650m
+    memory: 2000Mi
+  requests:
+    memory: 1000Mi
+    cpu: 500m
