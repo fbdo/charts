@@ -1,6 +1,7 @@
 image:
   repository: fbdo/shopware
   tag: latest
+  pullPolicy: Always
 
 resources:
   limits:

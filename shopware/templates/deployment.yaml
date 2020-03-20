@@ -48,13 +48,13 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
           livenessProbe:
             httpGet:
-              path: /
+              path: /fpm-ping
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /
+              path: /fpm-ping
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 5
