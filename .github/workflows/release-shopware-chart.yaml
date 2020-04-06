@@ -18,6 +18,11 @@ jobs:
         with:
           args: lint shopware
 
+      - name: Update Helm chart dependencies
+        uses: docker://lachlanevenson/k8s-helm
+        with:
+          args: dependency update shopware
+
       - name: Build Helm package
         uses: docker://lachlanevenson/k8s-helm
         with:
