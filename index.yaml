@@ -3,10 +3,17 @@ entries:
   shopware:
   - apiVersion: v1
     appVersion: 6.1.3
-    created: "2020-03-17T11:20:04.297798731Z"
+    created: "2020-04-06T12:19:06.067436136Z"
+    dependencies:
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - shopware-database
+      version: 7.x.x
     description: Shopware is a modular online shop system developed in Germany since
       2004
-    digest: 187317a008b6b21bdaa1e80d4ebd233b6c9939851e0f3d82ef7d687c5eb68111
+    digest: 459e08c0de43a23fd9fd1a9c552da03163f93b14888c12d3861fb3e4039f58ca
     home: https://www.shopware.com
     icon: https://www.shopware.com/media/unknown/97/41/bb/sw-logo-blue.svg
     keywords:
@@ -20,6 +27,6 @@ entries:
     sources:
     - https://github.com/shopware/platform
     urls:
-    - https://fbdo.github.io/charts/shopware-0.1.0.tgz
-    version: 0.1.0
-generated: "2020-03-17T11:20:04.296959033Z"
+    - https://fbdo.github.io/charts/shopware-0.2.0.tgz
+    version: 0.2.0
+generated: "2020-04-06T12:19:06.064484009Z"
