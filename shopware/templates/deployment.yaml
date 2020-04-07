@@ -10,7 +10,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 2
+      maxSurge: 1
       maxUnavailable: 0
   template:
     metadata:
@@ -21,45 +21,40 @@ spec:
     spec:
       containers:
         - name: shopware
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          image: {{ template "shopware.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: DATABASE_HOST
+            - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dev-db-secret
-                  key: host
-          #  - name: DATABASE_USERNAME
-          #    valueFrom:
-          #      secretKeyRef:
-          #        name: dev-db-secret
-          #        key: username
-          #  - name: DATABASE_PASSWORD
-          #    valueFrom:
-          #      secretKeyRef:
-          #        name: dev-db-secret
-          #        key: password
-          #  - name: DATABASE_URL
-          #    value: mysql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):3306/shopware
+                  name: {{ include "shopware.databaseSecretName" . }}
+                  key: mariadb-password
+            - name: DATABASE_USERNAME
+              value: {{ include "shopware.databaseUser" . | quote }}
+            - name: DATABASE_HOST
+              value: {{ include "shopware.databaseHost" . | quote }}
+            - name: DATABASE_URL
+              value: mysql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):3306/shopware
           ports:
             - containerPort: 8000
               name: http
               protocol: TCP
           resources:
             limits:
-              cpu: 1200m
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
             requests:
-              cpu: 800m
-              memory: "100Mi"
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
           livenessProbe:
             httpGet:
-              path: /
+              path: /fpm-ping
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /
+              path: /fpm-ping
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 5

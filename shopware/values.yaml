@@ -12,3 +12,42 @@ service:
   port: 80
   targetPort: 8000
   type: LoadBalancer
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2000Mi
+  requests:
+    memory: 1000Mi
+    cpu: 250m
+
+hpa:
+  minReplicas: 3
+  maxReplicas: 6
+  cpuAverageUtilization: 65
+  memoryTargetAverageValue: 1000Mi
+
+mariadb:
+  enabled: true
+  replication:
+    enabled: false
+  db:
+    name: shopware
+    user: shopware
+  master:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+  initdbScripts:
+    create_shopware_db.sql: |
+      CREATE DATABASE IF NOT EXISTS shopware;
+      GRANT ALL PRIVILEGES ON shopware.* TO 'shopware'@'%';
+
+externalDatabase:
+  host: localhost
+  user: shopware
+  password: ""
+  database: shopware
+  port: 3306
