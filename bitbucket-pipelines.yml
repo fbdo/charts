@@ -15,4 +15,4 @@ pipelines:
             - gcloud container clusters get-credentials $GCLOUD_CLUSTER --zone=$GCLOUD_ZONE --project $GCLOUD_PROJECT
             # DEPLOYMENT
             - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-            - helm upgrade -f showare/values-dev.yaml photodirect shopware --install --namespace=$ENVIRONMENT --set image.tag=latest
+            - helm upgrade -f shopware/values-dev.yaml photodirect shopware --install --namespace=$ENVIRONMENT --set image.tag=latest
