@@ -1,0 +1,20 @@
+options:
+    docker: true
+  pipelines:
+    branches:
+      master:
+        - step:
+            image: google/cloud-sdk:latest
+            name: Deploy to dev
+            deployment: dev
+            script:
+            # SETUP
+            - export IMAGE_NAME=us.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+            - export ENVIRONMENT=dev
+            - echo $KEY_FILE | base64 -d > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud config set project $GCLOUD_PROJECT
+            - gcloud container clusters get-credentials $GCLOUD_CLUSTER --zone=$GCLOUD_ZONE --project $GCLOUD_PROJECT
+            # DEPLOYMENT
+            - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+            - helm upgrade -f showare/values-dev.yaml photodirect shopware --install --namespace=$ENVIRONMENT --set image.tag=latest

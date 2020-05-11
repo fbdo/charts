@@ -1,0 +1,40 @@
+image:
+  repository: fbdo/shopware
+  tag: latest
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    memory: 1Gi
+    cpu: 1000m
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 3
+
+mariadb:
+  enabled: true
+  replication:
+    enabled: false
+  db:
+    name: shopware
+    user: shopware
+    password: shopware
+  master:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+
+ingress:
+  enabled: false
+
+persistence:
+  storageClass:
+
+shopware:
+  serviceAccountName: "default"
