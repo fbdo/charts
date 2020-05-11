@@ -13,7 +13,7 @@ resources:
 
 hpa:
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 1
 
 mariadb:
   enabled: true
@@ -34,7 +34,8 @@ ingress:
   enabled: false
 
 persistence:
-  storageClass:
+  accessMode: ReadWriteOnce
+  storageClass: standard
 
 shopware:
   serviceAccountName: "default"
