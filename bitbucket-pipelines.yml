@@ -1,13 +1,11 @@
-options:
-    docker: true
-  pipelines:
-    branches:
-      master:
-        - step:
-            image: google/cloud-sdk:latest
-            name: Deploy to dev
-            deployment: dev
-            script:
+pipelines:
+  branches:
+    master:
+      - step:
+          image: google/cloud-sdk:latest
+          name: Deploy to dev
+          deployment: dev
+          script:
             # SETUP
             - export IMAGE_NAME=us.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
             - export ENVIRONMENT=dev
