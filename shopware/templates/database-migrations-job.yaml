@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "db-migrate-{{ date "20060102150405" now }}"
+  annotations:
+    "helm.sh/hook": pre-upgrade
+spec:
+  ttlSecondsAfterFinished: 6000
+  activeDeadlineSeconds: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sw6-db-migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          volumeMounts: {{- include "shopware.volumeMounts" . | nindent 12 }}
+          env: {{- include "shopware.env" . | nindent 12 }}
+          command: ["/bin/sh"]
+          args:
+            [
+              "-c",
+              "bin/console database:migrate --all && \
+              bin/console dal:refresh:index && \
+              bin/console scheduled-task:register && \
+              bin/console plugin:refresh && \
+              bin/console theme:refresh && \
+              bin/console bundle:dump && \
+              bin/console theme:compile",
+            ]
+      volumes:
+        - name: shopware-data
+          persistentVolumeClaim:
+            claimName: {{ include "shopware.name" . | quote }}

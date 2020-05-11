@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled -}}
+{{- $path := .Values.ingress.path | default "/" | quote -}}
+{{- $service := include "shopware.name" . | quote -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "shopware.name" . | quote }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  tls:
+  - secretName: {{ .Chart.Name }}-tls
+    hosts:
+    {{- range .Values.ingress.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: {{ $path }}
+            backend:
+              serviceName:  {{ $service }}
+              servicePort: http
+  {{- end }}
+{{- end }}

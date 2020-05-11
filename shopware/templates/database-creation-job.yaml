@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-setup
+  annotations:
+    "helm.sh/hook": post-install
+spec:
+  ttlSecondsAfterFinished: 6000
+  activeDeadlineSeconds: 600
+  template:
+    spec:
+      restartPolicy: Never   
+      containers:
+        - name: sw6-db-setup
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          volumeMounts: {{- include "shopware.volumeMounts" . | nindent 12 }}
+          env: {{- include "shopware.env" . | nindent 12 }}
+            - name: JWT_PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "shopware.secretName" . }}
+                  key: jwt-passphrase
+            - name: ADMIN_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "shopware.secretName" . }}
+                  key: admin-password
+          command: ["/bin/sh"]
+          args:
+            [
+              "-c",
+              "until nc -z $DATABASE_HOST 3306; do echo 'waiting for database'; sleep 15; done && \
+              bin/console system:install --create-database --force && \
+              bin/console user:create admin --password=\"$ADMIN_PASS\" --admin && \
+              bin/console system:setup --no-interaction --database-url \"$DATABASE_URL\" --generate-jwt-keys --jwt-passphrase \"$JWT_PASSPHRASE\" --env \"{{ .Values.labels.env }}\" --force && \
+              bin/console sales-channel:create:storefront --url=\"{{ include "shopware.storefrontURL" . }}\"",
+            ]
+      volumes:
+        - name: shopware-data
+          persistentVolumeClaim:
+            claimName: {{ include "shopware.name" . | quote }}

@@ -57,56 +57,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Return the proper shopware image name
-*/}}
-{{- define "shopware.image" -}}
-{{- $registryName := .Values.image.registry -}}
-{{- $repositoryName := .Values.image.repository -}}
-{{- $tag := .Values.image.tag | toString -}}
-{{/*
-Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
-but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
-Also, we can't use a single if because lazy evaluation is not an option
-*/}}
-{{- if .Values.global }}
-    {{- if .Values.global.imageRegistry }}
-        {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
-    {{- else -}}
-        {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-    {{- end -}}
-{{- else -}}
-    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "shopware.customHTAccessCM" -}}
 {{- printf "%s" .Values.customHTAccessCM -}}
-{{- end -}}
-
-{{/*
-Return the proper image name (for the metrics image)
-*/}}
-{{- define "shopware.metrics.image" -}}
-{{- $registryName := .Values.metrics.image.registry -}}
-{{- $repositoryName := .Values.metrics.image.repository -}}
-{{- $tag := .Values.metrics.image.tag | toString -}}
-{{/*
-Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
-but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
-Also, we can't use a single if because lazy evaluation is not an option
-*/}}
-{{- if .Values.global }}
-    {{- if .Values.global.imageRegistry }}
-        {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
-    {{- else -}}
-        {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-    {{- end -}}
-{{- else -}}
-    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-{{- end -}}
 {{- end -}}
 
 {{/*
@@ -176,6 +130,17 @@ but Helm 2.9 and 2.10 does not support it, so we need to implement this if-else 
             {{- printf "storageClassName: %s" .Values.persistence.storageClass -}}
         {{- end -}}
     {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return  the proper Service Account Name
+*/}}
+{{- define "shopware.serviceAccountName" -}}
+{{- if .Values.shopware.serviceAccountName -}}
+{{- printf "%s" .Values.shopware.serviceAccountName -}}
+{{- else -}}
+{{- print "default" -}}
 {{- end -}}
 {{- end -}}
 
@@ -259,7 +224,7 @@ Return the MariaDB User
 {{- end -}}
 
 {{/*
-Return the MariaDB User
+Return the database secret name
 */}}
 {{- define "shopware.databaseSecretName" -}}
 {{- if .Values.mariadb.enabled }}
@@ -267,6 +232,95 @@ Return the MariaDB User
 {{- else -}}
     {{- printf "%s-%s" .Release.Name "externaldb" -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Return the shopware secret name
+*/}}
+{{- define "shopware.secretName" -}}
+{{- printf "%s-%s" .Release.Name "shopware" -}}
+{{- end -}}
+
+{{/*
+Return the Storefront URL
+*/}}
+{{- define "shopware.storefrontURL" -}}
+{{- if .Values.shopware.storefrontURL }}
+    {{- printf "%s" .Values.shopware.storefrontURL -}}
+{{- else -}}
+    {{- printf "%s" "http://shopware.local" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return SW6 volume mounts
+*/}}
+{{- define "shopware.volumeMounts" -}}
+- mountPath: "/sw6/config/jwt"
+  name: shopware-data
+  subPath: "config/jwt"
+- mountPath: "/sw6/config/packages"
+  name: shopware-data
+  subPath: "config/packages"
+- mountPath: "/sw6/config/secrets"
+  name: shopware-data
+  subPath: "config/secrets"
+- mountPath: "/sw6/public/bundles"
+  name: shopware-data
+  subPath: "public/bundles"
+- mountPath: "/sw6/public/css"
+  name: shopware-data
+  subPath: "public/css"
+- mountPath: "/sw6/public/fonts"
+  name: shopware-data
+  subPath: "public/fonts"
+- mountPath: "/sw6/public/js"
+  name: shopware-data
+  subPath: "public/js"
+- mountPath: "/sw6/public/media"
+  name: shopware-data
+  subPath: "public/media"
+- mountPath: "/sw6/public/sitemap"
+  name: shopware-data
+  subPath: "public/sitemap"
+- mountPath: "/sw6/public/theme"
+  name: shopware-data
+  subPath: "public/theme"
+- mountPath: "/sw6/public/thumbnail"
+  name: shopware-data
+  subPath: "public/thumbnail"
+- mountPath: "/sw6/custom/plugins"
+  name: shopware-data
+  subPath: "custom/plugins"
+- mountPath: "/sw6/custom/static-plugins"
+  name: shopware-data
+  subPath: "custom/static-plugins"
+              
+{{- end -}}
+
+{{/*
+Return SW6 environment variables
+*/}}
+{{- define "shopware.env" -}}
+- name: DATABASE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "shopware.databaseSecretName" . }}
+      key: mariadb-password
+- name: DATABASE_USERNAME
+  value: {{ include "shopware.databaseUser" . | quote }}
+- name: DATABASE_HOST
+  value: {{ include "shopware.databaseHost" . | quote }}
+- name: DATABASE_URL
+  value: mysql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):3306/shopware
+- name: APP_URL
+  value: {{ include "shopware.storefrontURL" . }}
+- name: APP_SECRET
+  value: "def0000086d2b7dff7427e926d7d7dfbc00d20744d04f6129148a8abbbe67c0d493062a9ad0cbd410536e2ee0339d7798dd2b8148f075ff63562abd74c5c5463cb43aafc"
+- name: INSTANCE_ID
+  value: "2376t27364726354uzwzrutwe238764273"
+- name: APP_ENV
+  value: {{ .Values.labels.env | quote }}
 {{- end -}}
 
 {{/*

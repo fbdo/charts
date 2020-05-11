@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  sw6: |
+    SHOPWARE_ES_HOSTS="elasticsearch:9200"
+    SHOPWARE_ES_ENABLED="0"
+    SHOPWARE_ES_INDEXING_ENABLED="0"
+    SHOPWARE_ES_INDEX_PREFIX="sw"
+    SHOPWARE_HTTP_CACHE_ENABLED="1"
+    SHOPWARE_HTTP_DEFAULT_TTL="7200"
+    SHOPWARE_CDN_STRATEGY_DEFAULT="id"
+    APP_ENV="{{ .Values.labels.env }}"
+    APP_URL="{{ include "shopware.storefrontURL" . }}"
+    APP_SECRET="def00000755b4d66dc1332ec55eee114cb8df521d67dc29cfbd0983e461dab533390b9482c6ddb478073d15e0090e57f103800d2dfd07563d768da9fd71f3cab38505212"
+    INSTANCE_ID="pmCO5slXDcEnWc6Zjm76DZ6F7b8lH5JK"
+
+kind: ConfigMap
+metadata:
+  name: sw6-env-file
