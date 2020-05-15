@@ -28,7 +28,6 @@ hpa:
 
 shopware:
   storefrontURL: "http://shopware.local"
-  jwtPassphrase: "REPLACE-WITH-SECURE-RANDOM-PASSPHRASE"
   adminPassword: "shopware"
   serviceAccountName: "photodirect-pod"
 
